@@ -2,6 +2,10 @@ package dryclean;
 
 import javax.swing.*;
 import java.awt.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.sql.*;
+import java.util.Arrays;
 
 public class FormLayout extends JPanel {
     protected FormLayout(){}
@@ -65,7 +69,7 @@ public class FormLayout extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         return gbc;
     }
-    public void createRegisterUI(){
+    protected void createRegisterUI(){
         JFrame frame = new JFrame("Register");
         frame.getContentPane().add(new FormLayout(frame));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -75,12 +79,14 @@ public class FormLayout extends JPanel {
         frame.setResizable(false);
 
     }
-    public void handleRegister(JTextField userNameField, JPasswordField passwordField, JPasswordField password2Field)
+    private void handleRegister(JTextField userNameField, JPasswordField passwordField, JPasswordField password2Field)
     {
         JFrame errorFrame = new JFrame();
         errorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         try{
             String userName = userNameField.getText().trim();
+            char[] password = passwordField.getPassword();
+            char[] password2 = password2Field.getPassword();
 
             if (userName.isEmpty()) {
                 throw new IllegalArgumentException("User name cannot be empty.");
@@ -93,13 +99,62 @@ public class FormLayout extends JPanel {
             {
                 throw new IllegalArgumentException("Password must be confirmed.");
             }
-            if(!passwordField.equals(password2Field)){
+            else if(!Arrays.equals(password, password2)){
                 JOptionPane.showMessageDialog(errorFrame, "Passwords don't match", "Error", JOptionPane.ERROR_MESSAGE);
             }
-            //TODO: ADD USERNAME & ENCRYPT AND ADD PASSWORD TO DATABASE
+            else{
+                //Get encrypted password
+                String encryptedPassword = null;
+                try{
+                    EncryptPassword ep = new EncryptPassword();
+                    encryptedPassword = ep.generateStrongPasswordHash(new String(password));
+                    if(encryptedPassword == null){
+                        throw new RuntimeException();
+                    }
+                    //Clear char[] for security
+                    Arrays.fill(password, '0');
+                    Arrays.fill(password2, '0');
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                    throw new RuntimeException(e);
+                }
+                //Check if the data to be inserted is already in database
+                try{
+                    Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/CyprusDryCleanDB", "drycleanAdmin", "1234");
+                    String query = "SELECT userName FROM Admin WHERE userName = ?";
+                    PreparedStatement preparedStatement = c.prepareStatement(query);
+                    preparedStatement.setString(1, userName);
 
+                    ResultSet resultSet = preparedStatement.executeQuery();
+
+                    if(resultSet.next()){
+                        throw new IllegalArgumentException("User name already exists");
+                    }
+                    System.out.println(resultSet.next());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                //Insert Data
+                try{
+                    Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/CyprusDryCleanDB", "drycleanAdmin", "1234");
+                    String query = "INSERT INTO Admin(userName, password) VALUES (?, ?)";
+                    PreparedStatement preparedStatement = c.prepareStatement(query);
+
+                    preparedStatement.setString(1, userName);
+                    preparedStatement.setString(2, encryptedPassword);
+
+                    int rowsInserted = preparedStatement.executeUpdate();
+                    if (rowsInserted <= 0){
+                        throw new RuntimeException();
+                    }
+                }catch (SQLException e){
+                    throw new RuntimeException(e);
+                }
+            }
         }catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(errorFrame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }catch (RuntimeException e){
+            System.exit(1);
         }
     }
 }
