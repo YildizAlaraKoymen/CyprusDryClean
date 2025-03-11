@@ -106,162 +106,27 @@ public class CyprusDryClean {
     }
     public void login()
     {
-
+        Login login = new Login();
+        login.createLoginUI();
     }
     public void register()
     {
-        FormLayout register = new FormLayout();
+        Register register = new Register();
         register.createRegisterUI();
     }
-    public void menu()
-    {
-        // Main frame
-        JFrame frame = new JFrame("CyprusDry Clean Menu");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 600);
-        frame.setLayout(new BorderLayout());
 
-        // Title label
-        JLabel titleLabel = new JLabel("Welcome to CyprusDry Clean!", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        frame.add(titleLabel, BorderLayout.NORTH);
-
-        // Menu panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(15, 1, 5, 5)); // 15 rows for each menu item
-
-        // Menu options
-        String[] menuItems = {
-                "1. Add Employee",
-                "2. Delete Employee",
-                "3. List Employee Details",
-                "4. Add Customer",
-                "5. Delete Customer",
-                "6. List Customer Details",
-                "7. Put Order",
-                "8. Show Customer Order Details",
-                "9. Show Customer Order Total Cost",
-                "10. List Employees",
-                "11. List Customers",
-                "12. Add Health Inspection",
-                "13. Compare Customer Loyalty",
-                "14. Print Employee Health Inspection",
-                "0. Exit"
-        };
-
-        //Row for each menu item
-        for (String menuItem : menuItems) {
-            JPanel rowPanel = new JPanel(new BorderLayout(5, 5)); // Panel for each row
-            JLabel label = new JLabel(menuItem);
-            JButton button = new JButton("Select");
-
-            button.addActionListener(e -> handleMenu(menuItem));
-
-            rowPanel.add(label, BorderLayout.CENTER);
-            rowPanel.add(button, BorderLayout.EAST);
-
-            buttonPanel.add(rowPanel);
-        }
-
-        frame.add(buttonPanel, BorderLayout.CENTER);
-
-        frame.setVisible(true);
-    }
     /**
      * Handles menu item selection.
      * @param menuItem the menu item selected
      */
-    public void handleMenu(String menuItem)
-    {
-        switch (menuItem) {
-            case "1. Add Employee":
-                addEmployee();
-                break;
-            case "2. Delete Employee":
-                deleteEmployee();
-                break;
-            case "3. List Employee Details":
-                listEmployeeDetails();
-                break;
-            case "4. Add Customer":
-                addCustomer();
-                break;
-            case "5. Delete Customer":
-                deleteCustomer();
-                break;
-            case "6. List Customer Details":
-                getCustomerDetails();
-                break;
-            case "7. Put Order":
-                putOrder();
-                break;
-            case "8. Show Customer Order Details":
-                getCustomerOrderDetails();
-                break;
-            case "9. Show Customer Order Total Cost":
-                getCustomerOrderTotalCost();
-                break;
-            case "10. List Employees":
-                listEmployees();
-                break;
-            case "11. List Customers":
-                listCustomers();
-                break;
-            case "12. Add Health Inspection":
-                addHealthInspection();
-                break;
-            case "13. Compare Customer Loyalty":
-                compareCustomerLoyalty();
-                break;
-            case "14. Print Employee Health Inspection":
-                printHealthInspection();
-                break;
-            case "0. Exit":
-                exit();
-                break;
-            default:
-                JOptionPane.showMessageDialog(null, "Invalid option selected.");
-        }
-    }
+
 
     // Employee Management Methods
 
     /**
      * Opens a form to add a new employee.
      */
-    public void addEmployee()
-    {
-        // Create the frame and components
-        JFrame frame = createFormFrame("Add Employee");
-        JPanel panel = new JPanel();
 
-        // Create the input fields
-        JTextField idField = createTextField();
-        JTextField fullNameField = createTextField();
-        JSpinner dobSpinner = createDateSpinner();
-        JSpinner startDateSpinner = createDateSpinner();
-
-        // Add components to the frame
-        addFormRow(panel, "Employee ID:", idField);
-        addFormRow(panel, "Full Name:", fullNameField);
-        addFormRow(panel, "Date of Birth:", dobSpinner);
-        addFormRow(panel, "Start Date:", startDateSpinner);
-
-        // Add buttons
-        JButton submitButton = new JButton("Submit");
-        JButton cancelButton = new JButton("Cancel");
-        addFormButtons(panel, submitButton, cancelButton);
-
-        // Submit button action
-        submitButton.addActionListener(e -> handleAddEmployeeForm(frame, idField, fullNameField, dobSpinner, startDateSpinner));
-
-        // Cancel button action
-        cancelButton.addActionListener(e -> frame.dispose());
-
-        // Display the frame
-        frame.add(panel);
-        frame.setVisible(true);
-    }
 
     /**
      * Create general form
@@ -349,49 +214,7 @@ public class CyprusDryClean {
      * @param startDateSpinner employee start date
      */
 
-    private void handleAddEmployeeForm(JFrame frame, JTextField idField, JTextField fullNameField, JSpinner dobSpinner, JSpinner startDateSpinner)
-    {
-        try {
-            // Validate and parse inputs
-            int id = Integer.parseInt(idField.getText().trim());
-            String fullName = fullNameField.getText().trim();
-            if (fullName.isEmpty()) {
-                throw new IllegalArgumentException("Full name cannot be empty.");
-            }
 
-            String[] splitName = fullName.split(" ");
-            String firstName = splitName.length > 1 ? fullName.substring(0, fullName.lastIndexOf(" ")) : fullName;
-            String lastName = splitName.length > 1 ? splitName[splitName.length - 1] : "";
-
-            LocalDate dob = convertDateToLocalDate((Date) dobSpinner.getValue());
-            LocalDate startDate = convertDateToLocalDate((Date) startDateSpinner.getValue());
-
-            // Create and validate new employee
-            Employee newEmployee = new Employee();
-            newEmployee.setID(id);
-            newEmployee.setName(firstName);
-            newEmployee.setSurname(lastName);
-            newEmployee.setDateOfBirth(dob);
-            newEmployee.setStartDate(startDate);
-
-            if (empList.contains(newEmployee)) {
-                JOptionPane.showMessageDialog(frame, "Employee already exists.", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                empList.add(newEmployee);
-
-                // Save to file
-                LoadInfo cusFile = new LoadInfo();
-                cusFile.createEmployee("employee.dat", this);
-
-                JOptionPane.showMessageDialog(frame, "Employee added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                frame.dispose();
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(frame, "Invalid ID. Please enter a numeric value.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(frame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
 
     /**
      * For spinner

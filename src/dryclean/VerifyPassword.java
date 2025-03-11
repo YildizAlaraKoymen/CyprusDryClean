@@ -5,8 +5,8 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.*;
 import java.security.spec.*;
 
-public abstract class VerifyPassword {
-    private static boolean validatePassword(String enteredPassword, String storedPassword)
+public class VerifyPassword {
+    protected static boolean validatePassword(String enteredPassword, String storedPassword)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         String[] parts = storedPassword.split(":");

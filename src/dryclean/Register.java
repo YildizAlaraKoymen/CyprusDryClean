@@ -7,9 +7,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.Arrays;
 
-public class FormLayout extends JPanel {
-    protected FormLayout(){}
-    protected FormLayout(JFrame frame){
+public class Register extends JPanel {
+    protected Register(){}
+    protected Register(JFrame frame){
         setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = makeGbc(0, 0);
@@ -71,7 +71,7 @@ public class FormLayout extends JPanel {
     }
     protected void createRegisterUI(){
         JFrame frame = new JFrame("Register");
-        frame.getContentPane().add(new FormLayout(frame));
+        frame.getContentPane().add(new Register(frame));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setLocationRelativeTo(null);
