@@ -85,8 +85,8 @@ public class Register extends JPanel {
         errorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         try{
             String userName = userNameField.getText().trim();
-            char[] password = passwordField.getPassword();
-            char[] password2 = password2Field.getPassword();
+            String password = String.copyValueOf(passwordField.getPassword());
+            String password2 = String.copyValueOf(password2Field.getPassword());
 
             if (userName.isEmpty()) {
                 throw new IllegalArgumentException("User name cannot be empty.");
@@ -99,7 +99,7 @@ public class Register extends JPanel {
             {
                 throw new IllegalArgumentException("Password must be confirmed.");
             }
-            else if(!Arrays.equals(password, password2)){
+            else if(!password.equals(password2)){
                 JOptionPane.showMessageDialog(errorFrame, "Passwords don't match", "Error", JOptionPane.ERROR_MESSAGE);
             }
             else{
@@ -107,13 +107,13 @@ public class Register extends JPanel {
                 String encryptedPassword = null;
                 try{
                     EncryptPassword ep = new EncryptPassword();
-                    encryptedPassword = ep.generateStrongPasswordHash(new String(password));
+                    encryptedPassword = ep.generateStrongPasswordHash(password);
                     if(encryptedPassword == null){
                         throw new RuntimeException();
                     }
                     //Clear char[] for security
-                    Arrays.fill(password, '0');
-                    Arrays.fill(password2, '0');
+                    password = "0";
+                    password2 = "0";
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                     throw new RuntimeException(e);
                 }
@@ -129,7 +129,6 @@ public class Register extends JPanel {
                     if(resultSet.next()){
                         throw new IllegalArgumentException("User name already exists");
                     }
-                    System.out.println(resultSet.next());
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

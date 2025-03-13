@@ -30,7 +30,7 @@ public class AddEmployee extends JPanel{
 
         gbc = makeGbc(0, 1);
         JLabel DOBLabel = new JLabel("Date of Birth: ");
-        add(FullNameLabel, gbc);
+        add(DOBLabel, gbc);
 
         panel = new JPanel();
         JSpinner DOBSpinner = createDateSpinner();
@@ -55,7 +55,7 @@ public class AddEmployee extends JPanel{
         add(NationalityLabel, gbc);
 
         panel = new JPanel();
-        JTextField nationalityField = new JTextField();
+        JTextField nationalityField = new JTextField(15);
         panel.add(nationalityField);
         panel.setBorder(BorderFactory.createEtchedBorder());
         gbc = makeGbc(1, 3);
@@ -185,10 +185,12 @@ public class AddEmployee extends JPanel{
                 PreparedStatement preparedStatement = c.prepareStatement(query);
                 preparedStatement.setString(1, dob.toString());
                 preparedStatement.setString(2, firstName);
-                preparedStatement.setString(3,lastName);
-                preparedStatement.setString(4,startTime.toString());
-                preparedStatement.setString(5,nationality);
+                preparedStatement.setString(3, lastName);
+                preparedStatement.setString(4, startTime.toString());
+                preparedStatement.setString(5, nationality);
                 preparedStatement.setString(6, workPermit.toString());
+                preparedStatement.executeQuery();
+
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

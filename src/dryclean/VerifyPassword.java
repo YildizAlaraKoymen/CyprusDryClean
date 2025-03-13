@@ -2,6 +2,7 @@ package dryclean;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.*;
 
@@ -18,6 +19,9 @@ public class VerifyPassword {
         PBEKeySpec spec = new PBEKeySpec(enteredPassword.toCharArray(), salt, iterations, hash.length * 8);
         SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         byte[] testHash = skf.generateSecret(spec).getEncoded();
+
+        System.out.println(hash.length);
+        System.out.println("Test hash:" + toHex(testHash));
 
         int diff = hash.length ^ testHash.length;
         for(int i = 0; i < hash.length && i < testHash.length; i++)
@@ -36,4 +40,12 @@ public class VerifyPassword {
         }
         return bytes;
     }
+    private static String toHex(byte[] array) {
+        StringBuilder sb = new StringBuilder(array.length * 2);
+        for (byte b : array) {
+            sb.append(String.format("%02x", b & 0xff)); // Convert byte to 2-digit hex
+        }
+        return sb.toString();
+    }
+
 }

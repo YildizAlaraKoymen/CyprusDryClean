@@ -41,7 +41,7 @@ public class Menu extends JPanel{
             add(menuLabel, gbc);
             gbc = makeGbc(1, i);
             JButton button = new JButton("Select");
-            add(menuLabel, gbc);
+            add(button, gbc);
             button.addActionListener(e -> handleMenu(menuItem));
             i++;
         }

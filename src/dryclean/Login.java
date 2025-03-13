@@ -72,13 +72,13 @@ public class Login extends JPanel {
         errorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         try{
             String userName = userNameTextField.getText().trim();
-            char[] password = passwordField.getPassword();
+            String password = String.copyValueOf(passwordField.getPassword());
 
             if(userName.isEmpty())
             {
                 throw new IllegalArgumentException("User name cannot be empty.");
             }
-            else if(password.length == 0)
+            else if(password.isEmpty())
             {
                 throw new IllegalArgumentException("Password cannot be empty.");
             }
@@ -86,18 +86,20 @@ public class Login extends JPanel {
             try{
                 Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/CyprusDryCleanDB", "drycleanAdmin", "1234");
                 String query = "SELECT userName, password FROM Admin WHERE userName = ?";
-                PreparedStatement preparedStatement = c.prepareStatement(query);
+                PreparedStatement preparedStatement = c.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);//Make it scrollable
                 preparedStatement.setString(1, userName);
 
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if(!resultSet.next())
                     throw new IllegalArgumentException("The userName or password is incorrect.");
-
                 VerifyPassword vp = new VerifyPassword();
+                resultSet.previous();//Back to before row cursor
                 while(resultSet.next()){
                     String storedPassword = resultSet.getString("password");
-                    if(!vp.validatePassword(new String(password), storedPassword))
+                    if(!vp.validatePassword(password, storedPassword))
+                    {
                         throw new IllegalArgumentException("The userName or password is incorrect.");
+                    }
                     else{
                         System.out.println("hfsjkfaö");
                         Menu menuPanel = new Menu();

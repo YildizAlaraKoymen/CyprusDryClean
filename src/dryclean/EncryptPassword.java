@@ -30,20 +30,12 @@ public class EncryptPassword {
         sr.nextBytes(salt);
         return salt;
     }
-    private static String toHex(byte[] array)
-            throws NoSuchAlgorithmException
-    {
-        BigInteger bi = new BigInteger(1, array);
-        String hex = bi.toString();
-
-        int paddingLength = (array.length * 2) - hex.length();
-        if(paddingLength > 0)
-        {
-            return String.format("%0" + paddingLength + "d", 0) + hex;
+    private static String toHex(byte[] array) {
+        StringBuilder sb = new StringBuilder(array.length * 2);
+        for (byte b : array) {
+            sb.append(String.format("%02x", b & 0xff)); // Convert byte to 2-digit hex
         }
-        else
-        {
-            return hex;
-        }
+        return sb.toString();
     }
+
 }
