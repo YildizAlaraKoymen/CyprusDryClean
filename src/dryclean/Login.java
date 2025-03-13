@@ -6,8 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 
-//TODO: FIX VALIDATE PASSWORD
-//TODO: FIX LOGIN IN GENERAL
 public class Login extends JPanel {
     protected Login(){}
     protected Login(JFrame frame){

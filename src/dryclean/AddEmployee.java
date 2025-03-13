@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
-//TODO: Delete id field and make it auto increment
+//TODO: Fix database addition
 public class AddEmployee extends JPanel{
     AddEmployee(){}
     AddEmployee(JFrame frame)
